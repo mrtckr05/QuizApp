@@ -61,4 +61,4 @@ QuizAppPython/
 - **Fen (Science):** SCI1, SCI2, etc.
 - **Tarih (History):** HIST1, HIST2, etc.
 - **Coğrafya (Geography):** GEO1, GEO2, etc.
-- **İngilizce: AI asks   
+- **İngilizce:** AI asks   
