@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .hangman-box {
+            background-color: #f9f9f9;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 500px;
+            height: 100%;
+            text-align: center;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .question-container {
+            flex-grow: 1;
+            margin-left: 30px;
+        }
+        .hangman-image {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            border-radius: 10px;
+            flex-grow: 1;
+            object-fit: contain;
+        }
+        .progress-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .option-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        .option-item:hover {
+            background: #e9ecef;
+            border-color: #007bff;
+            transform: translateY(-2px);
+        }
+        .form-check-input {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .form-check-input:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+        .form-check-label {
+            outline: none !important;
+            text-decoration: none !important;
+        }
+        .form-check-label:focus {
+            outline: none !important;
+            text-decoration: none !important;
+        }
+        .main-row {
+            min-height: 700px;
+            align-items: stretch;
+        }
+        .hangman-col {
+            display: flex;
+            align-items: stretch;
+            width: 500px;
+            max-width: 500px;
+        }
+        .question-col {
+            flex: 1;
+        }
+    </style>
+</head>
+<body class="container-fluid mt-4">
+    <div class="row main-row">
+        <!-- Left: Hangman image -->
+        <div class="col hangman-col">
+            <div class="hangman-box">
+                <img src="{{ url_for('static', filename='img/' + img_name) }}" alt="Adam Asmaca" class="hangman-image">
+                <div class="mt-3">
+                    <h5 class="text-danger mb-2">Yanlış Cevap Sayısı</h5>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" role="progressbar" 
+                             data-width="{{ (wrong_count / max_wrong) * 100 }}">
+                            {{ wrong_count }} / {{ max_wrong }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right: Question -->
+        <div class="col question-col">
+            <div class="question-container">
+                <div class="progress-info">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4 class="mb-2">Soru {{ qnum }} / {{ total }}</h4>
+                        <span id="timer" style="font-size: 1.5rem; color: #ff5722; font-weight: bold;">07</span>
+                    </div>
+                    <p class="mb-0">Kategori: {{ session.get('category', '') }}</p>
+                </div>
+                
+                <form method="post">
+                    <div class="question-card">
+                        <h5 class="mb-4 text-primary">{{ question.question }}</h5>
+                        
+                        {% for option in question.options %}
+                        <div class="option-item">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" 
+                                       name="option" id="option{{ loop.index0 }}" 
+                                       value="{{ ['A','B','C','D'][loop.index0] }}" required>
+                                <label class="form-check-label w-100" for="option{{ loop.index0 }}">
+                                    <strong>{{ ['A','B','C','D'][loop.index0] }}.</strong> {{ option }}
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-success btn-lg px-5">
+                                Cevabı Gönder
+                            </button>
+                        </div>
+                        <!-- AI-powered Hint Button -->
+                        <div class="text-center mt-3">
+                            <button id="ai-hint-btn" type="button" style="border: none; background: none; outline: none;">
+                                <img src="https://img.icons8.com/color/96/000000/idea-sharing.png" alt="Hint AI-powered" style="width: 60px; height: 60px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                                <div style="font-size: 0.9rem; color: #555; margin-top: 5px; font-weight: bold;">Hint AI-powered</div>
+                            </button>
+                            <div id="ai-hint-text" style="margin-top: 10px; color: #007bff; font-style: italic;"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Set progress bar width from data attribute
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBar = document.querySelector('.progress-bar');
+            const width = progressBar.getAttribute('data-width');
+            progressBar.style.width = width + '%';
+        });
+
+        // Timer logic
+        let timeLeft = 16;
+        const timerDisplay = document.getElementById('timer');
+        const form = document.querySelector('form');
+        function updateTimer() {
+            timerDisplay.textContent = timeLeft < 10 ? '0' + timeLeft : timeLeft;
+            if (timeLeft <= 0) {
+                form.submit();
+            } else {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            }
+        }
+        updateTimer();
+
+        // AI-powered Hint Button logic
+        document.getElementById('ai-hint-btn').addEventListener('click', async function() {
+            const btn = this;
+            btn.disabled = true;
+            btn.style.opacity = 0.6;
+            const hintText = document.getElementById('ai-hint-text');
+            hintText.textContent = 'AI düşünüyor...';
+            try {
+                const response = await fetch('/ai_hint', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: document.querySelector('.question-card h5').textContent })
+                });
+                const data = await response.json();
+                hintText.textContent = data.hint || 'Hiçbir ipucu bulunamadı.';
+            } catch (e) {
+                hintText.textContent = 'İpucu alınamadı.';
+            }
+            btn.disabled = false;
+            btn.style.opacity = 1;
+        });
+    </script>
+</body>
+</html> 
