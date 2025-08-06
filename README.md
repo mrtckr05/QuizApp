@@ -4,8 +4,9 @@ A web-based quiz application built with Flask, featuring a hangman-style game wh
 
 ## Features
 
-- Multiple quiz categories (Science, History, Geography, Math, General Culture)
-- Questions loaded from SQLite database
+- Multiple quiz categories (Science, History, Geography, English)
+- Science, History and Geography Questions loaded from SQLite database
+- English questions are asked by AI(Gemini)
 - Hangman-style game mechanics
 - One question at a time display
 - Real-time wrong answer tracking
@@ -60,5 +61,4 @@ QuizAppPython/
 - **Fen (Science):** SCI1, SCI2, etc.
 - **Tarih (History):** HIST1, HIST2, etc.
 - **Coğrafya (Geography):** GEO1, GEO2, etc.
-- **Matematik (Math):** MATH1, MATH2, etc.
-- **Genel Kültür (General Culture):** GEN1, GEN2, etc. 
+- **İngilizce: AI asks   
