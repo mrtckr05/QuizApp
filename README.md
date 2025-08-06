@@ -1,64 +1,70 @@
 # QuizApp Python (Flask)
 
-A web-based quiz application built with Flask, featuring a hangman-style game where users answer questions and see the hangman image update based on wrong answers.
+Bir Flask tabanlı web bilgi yarışması uygulaması. Adam asmaca tarzı yanlış cevap takibi, çoktan seçmeli sorular ve AI destekli İngilizce kategori içerir.
 
-## Features
+## Özellikler
 
-- Multiple quiz categories (Science, History, Geography, Math, General Culture)
-- Questions loaded from SQLite database
-- Hangman-style game mechanics
-- One question at a time display
-- Real-time wrong answer tracking
-- Responsive design with Bootstrap
+- Birden fazla kategori (Fen, Tarih, Coğrafya, İngilizce-AI)
+- Sorular SQLite veritabanından veya İngilizce için Gemini AI ile dinamik üretilir
+- Adam asmaca tarzı yanlış cevap görselleştirme
+- Soru başına zamanlayıcı ve ipucu (AI-powered Hint, 3 hak)
+- Responsive tasarım (Bootstrap)
+- Kategoriye göre zorluk seviyeli soru dağılımı
 
-## Setup
+## Kurulum
 
-1. **Install dependencies:**
+1. **Bağımlılıkları yükleyin:**
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **Run the application:**
+2. **Gemini API anahtarınızı ekleyin:**
+   - `app.py` dosyasındaki `key = "your-api-key-here"` satırını kendi anahtarınızla değiştirin.
+
+3. **Uygulamayı başlatın:**
    ```bash
    python app.py
    ```
 
-3. **Open your browser and go to:**
+4. **Tarayıcıda açın:**
    ```
    http://127.0.0.1:5000
    ```
 
-## How to Play
+## Oynanış
 
-1. Enter your name and select a quiz category
-2. Answer questions one by one
-3. Each wrong answer adds to the hangman image
-4. The game ends when you either:
-   - Complete all questions, or
-   - Reach the maximum number of wrong answers (7)
+1. İsim girin ve kategori seçin
+2. Soruları tek tek cevaplayın
+3. Her yanlış cevap adam asmaca görselini ilerletir
+4. 3 kez AI destekli ipucu alabilirsiniz
+5. Tüm soruları tamamlayın veya maksimum yanlış sayısına ulaşınca oyun biter
 
-## File Structure
+## Klasör Yapısı
 
 ```
-QuizAppPython/
-├── app.py                 # Main Flask application
-├── requirements.txt       # Python dependencies
+QuizApp/
+├── app.py
+├── requirements.txt
 ├── static/
-│   └── img/              # Hangman images (hangman0.png to hangman7.png)
-├── templates/            # HTML templates
-│   ├── index.html        # Start page
-│   ├── quiz.html         # Quiz questions
-│   └── result.html       # Results page
-└── questions/            # Database and question files
-    ├── questions.db      # SQLite database with questions
-    ├── questions.py      # Question definitions
-    └── write_questions_to_db.py  # Script to populate database
+│   └── img/              # Adam asmaca görselleri
+├── templates/            # HTML şablonları
+│   ├── index.html
+│   ├── quiz.html
+│   └── result.html
+└── questions/
+    ├── questions.db      # SQLite veritabanı
+    ├── questions.py      # Soru tanımları
+    └── write_questions_to_db.py  # Veritabanı doldurma scripti
 ```
 
-## Categories Available
+## Kategoriler
 
-- **Fen (Science):** SCI1, SCI2, etc.
-- **Tarih (History):** HIST1, HIST2, etc.
-- **Coğrafya (Geography):** GEO1, GEO2, etc.
-- **Matematik (Math):** MATH1, MATH2, etc.
-- **Genel Kültür (General Culture):** GEN1, GEN2, etc. 
+- **Fen (Science):** Veritabanından
+- **Tarih (History):** Veritabanından
+- **Coğrafya (Geography):** Veritabanından
+- **İngilizce-AI Sana Sorsun:** Gemini AI ile dinamik, seviyeli İngilizce sorular
+
+## Notlar
+
+- İngilizce kategorisinde sorular ve cevaplar AI tarafından anlık üretilir, internet bağlantısı ve geçerli bir Gemini API anahtarı gereklidir.
+- AI ipucu özelliği tüm kategorilerde kullanılabilir (3 hak).
